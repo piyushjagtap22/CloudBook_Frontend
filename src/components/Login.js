@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
-import { Link,useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 // import {} from 'react-router'
+
+import { verify, login } from '../api/authApi';
 
 const Login = (props) => {
     const [credentials, setCredentials] = useState({ email: "", password: "" })
@@ -10,44 +12,45 @@ const Login = (props) => {
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
-       
+        try {
+            const response = await login({ email: credentials.email })
+                .then((res) => {
+                    if (res.status === 200) {
+                        console.log(res)
+                        // console.log(json.payload.id)
+                        navigate('/verify', { state: { userId: res.data.payload.id, email: credentials.email } })
 
-        const response = await fetch(process.env.REACT_APP_NODE_BACKEND_API+`/api/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-
-            },
-            body: JSON.stringify({ email: credentials.email, password: credentials.password })
-        })
-        const status = response.status
-        if ( status === 200) {
-            const json = await response.json()
-            localStorage.setItem('token',json.authToken)
-            navigate('/')
-            props.showAlert("Logged in Succesfully","success")
+                    }
+                    else {
+                        props.showAlert("Invalid Credentials", "danger")
+                    }
+                })
+        } catch (err) {
+            console.log(err)
+            console.log(err?.data?.message || err.error);
 
         }
-        else{
-            props.showAlert("Invalid Credentials","danger")
-        }
-       
 
-        
+
+
+
+
+
+
+
+
     }
     return (
         <div><form onSubmit={handleSubmit}>
             {/* <!-- Email input --> */}
             <div className="form-outline mb-4">
-                <input type="email" id="email" className="form-control" name="email" onChange={onChange} value={credentials.email}/>
                 <label className="form-label" htmlFor="email" >Email address</label>
+                <input type="email" id="email" className="form-control" name="email" onChange={onChange} value={credentials.email} />
+
             </div>
 
             {/* <!-- Password input --> */}
-            <div className="form-outline mb-4">
-                <input type="password" id="password" className="form-control" name="password" onChange={onChange} value={credentials.password} />
-                <label className="form-label" htmlFor="password" >Password</label>
-            </div>
+
 
             {/* <!-- 2 column grid layout for inline styling --> */}
             <div className="row mb-4">
@@ -59,10 +62,7 @@ const Login = (props) => {
                     </div> */}
                 </div>
 
-                <div className="col">
 
-                    <a href="#!">Forgot password?</a>
-                </div>
             </div>
 
 

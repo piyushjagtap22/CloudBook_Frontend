@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+
+import { verify, register } from '../api/authApi';
 const Signup = (props) => {
     const navigate = useNavigate()
-    const [credentials, setCredentials] = useState({ name: "", email: "", password: "" ,vpassword:""})
+    const [credentials, setCredentials] = useState({ name: "", email: "", password: "", vpassword: "" })
     const onChange = (e) => {
         setCredentials({ ...credentials, [e.target.name]: e.target.value })
     }
@@ -12,25 +14,34 @@ const Signup = (props) => {
         e.preventDefault();
 
 
-        const response = await fetch(process.env.REACT_APP_NODE_BACKEND_API+`/api/auth/createuser`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
+        const response = await register({ name: credentials.name, email: credentials.email })
+            .then((res) => {
+                console.log(res)
+                if (res.status === 200) {
+                    if (res.data.status.code === 200) {
+                        // dispatch(setUserId({ ...res.data.payload }));
+                        navigate('/verify', { state: { userId: res.data.payload.id, email: credentials.email } })
 
-            },
-            body: JSON.stringify({ name: credentials.name, email: credentials.email, password: credentials.password })
-        })
-        const status =  response.status
-        if (status === 200) {
-            const json = await response.json()
-            localStorage.setItem('token', json.authToken)
-            navigate('/')
-            props.showAlert("Account Created Succesfully","success")
+                        // navigate('/verify');
+                    }
+                    if (res.data.status === 409) {
+                        console.log("Display user already Exists, please Sign in")
+                    }
+                    else {
+                        console.log(res.data.payload)
+                    }
+                    // const json = await response.json()
+                    // localStorage.setItem('token', json.authToken)
+                    // navigate('/')
 
-        }
-        else {
-            props.showAlert("Invalid Details","danger")
-        }
+
+                }
+                else {
+                    props.showAlert("Invalid Details", "danger")
+                }
+            })
+
+
 
     }
 
@@ -65,24 +76,10 @@ const Signup = (props) => {
                                                 </div>
                                             </div>
 
-                                            <div className="d-flex flex-row align-items-center mb-4">
-                                                <i className="fas fa-lock fa-lg me-3 fa-fw"></i>
-                                                <div className="form-outline flex-fill mb-0">
-                                                    <input type="password" id="password" name="password" value={credentials.password} onChange={onChange} className="form-control" minLength={5}/>
-                                                    <label className="form-label" for="password">Password</label>
-                                                </div>
-                                            </div>
-
-                                            <div className="d-flex flex-row align-items-center mb-4">
-                                                <i className="fas fa-key fa-lg me-3 fa-fw"></i>
-                                                <div className="form-outline flex-fill mb-0">
-                                                    <input type="password" id="vpassword" name="vpassword" value={credentials.vpassword} onChange={onChange} className="form-control" minLength={5}/>
-                                                    <label className="form-label" for="vpassword">Repeat your password</label>
-                                                </div>
-                                            </div>
-
                                             <div className="form-check d-flex justify-content-center mb-5">
-                                                <input className="form-check-input me-2" type="checkbox" value="" id="form2Example3c" />
+                                                <div>
+                                                    <input className="form-check-input me-2" type="checkbox" value="" id="" />
+                                                </div>
                                                 <label className="form-check-label" for="form2Example3">
                                                     I agree all statements in <Link to="#!">Terms of service</Link>
                                                 </label>
