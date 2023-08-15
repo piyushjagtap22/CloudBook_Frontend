@@ -8,34 +8,6 @@ function NoteItem(props) {
     const context = useContext(noteContext)
     const { deleteNote } = context;
     const { note, updateNote } = props;
-    const deletingNote = async () => {
-        try {
-            const isSuccess = await deleteNote(note._id)
-            if (isSuccess) {
-                props.showAlert("Deleted Succesfully", "success")
-            } else {
-                props.showAlert("Error Deleting", "danger")
-            }
-        }
-        catch (err) {
-            props.showAlert("Error Deleting", "danger")
-            console.log(err)
-        }
-    }
-    const updatingNote = async () => {
-        try {
-            const isSuccess = await updateNote(note._id)
-            if (isSuccess) {
-                props.showAlert("Updated Succesfully", "success")
-            } else {
-                props.showAlert("Error Updating", "danger")
-            }
-        }
-        catch (err) {
-            props.showAlert("Error Deleting", "danger")
-            console.log(err)
-        }
-    }
     return (
         <div className='col-md-3'>
             <div className="card my-3" >
@@ -46,12 +18,12 @@ function NoteItem(props) {
                         {/* {tag} */}
                         <i className="fa-solid fa-pen-to-square mx-2 mb-3" onClick={() => {
                             updateNote(note);
-
+ 
                         }}></i>
                     </div>
                     <p className="card-text"> {description}</p>
                     {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
-                    <i className="fa-solid fa-trash-can mx-2 mb-3" onClick={deletingNote}></i>
+                    <i className="fa-solid fa-trash-can mx-2 mb-3" onClick={() => { deleteNote(note._id); props.showAlert("Deleted Succesfully","success")}}></i>
 
                 </div>
             </div>
