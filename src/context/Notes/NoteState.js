@@ -67,6 +67,7 @@ const NoteState = (props) => {
 
   //Delete a Note
   const deleteNote = async (id) => {
+    try{
     const newNotes = notes.filter((note) => { return note._id !== id })
     setNotes(newNotes)
     const response = await fetch(`${host}/api/notes/deletenote/${id}`, {
@@ -79,7 +80,10 @@ const NoteState = (props) => {
 
     // const json = await response.json();
     // const newNotes = notes.filter((note) => { return note._id !== id })
-
+  }
+  catch(err){
+    console.log(err)
+  }
 
   }
   return (

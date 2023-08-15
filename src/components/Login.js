@@ -10,8 +10,8 @@ const Login = (props) => {
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
-       
-
+       try{
+        console.log({ email: credentials.email, password: credentials.password })
         const response = await fetch(process.env.REACT_APP_NODE_BACKEND_API+`/api/auth/login`, {
             method: 'POST',
             headers: {
@@ -20,10 +20,11 @@ const Login = (props) => {
             },
             body: JSON.stringify({ email: credentials.email, password: credentials.password })
         })
-        const status = response.status
-        if ( status === 200) {
-            const json = await response.json()
-            localStorage.setItem('token',json.authToken)
+        const res = await response.json()
+        console.log(res)
+        if ( res.status.code === 200) {
+            // const json = await response.json()
+            localStorage.setItem('token',res.payload.authToken)
             navigate('/')
             props.showAlert("Logged in Succesfully","success")
 
@@ -31,7 +32,11 @@ const Login = (props) => {
         else{
             props.showAlert("Invalid Credentials","danger")
         }
-       
+    }
+    catch(err){
+        console.log(err)
+        props.showAlert("Internal Server Error","danger")
+    }
 
         
     }
